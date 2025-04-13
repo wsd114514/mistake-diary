@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --scrollbar-thin-width: 4px;
+  --scrollbar-track-color: transparent;
+  --scrollbar-thumb-color: rgba(0, 0, 0, 0.2);
+  --scrollbar-thumb-hover-color: rgba(0, 0, 0, 0.3);
 }
 
 @theme inline {
@@ -16,7 +20,73 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --scrollbar-thumb-color: rgba(255, 255, 255, 0.2);
+    --scrollbar-thumb-hover-color: rgba(255, 255, 255, 0.3);
   }
+}
+
+/* 自定义滚动条样式 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;      /* Firefox */
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: var(--scrollbar-thin-width);  /* Chrome, Safari, Opera */
+  height: var(--scrollbar-thin-width);
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
+}
+
+/* 仅在悬停时显示滚动条 */
+.scrollbar-hover {
+  scrollbar-width: none;      /* Firefox */
+}
+
+.scrollbar-hover::-webkit-scrollbar {
+  width: 0;                    /* Chrome, Safari, Opera */
+  height: 0;
+}
+
+.scrollbar-hover:hover {
+  scrollbar-width: thin;       /* Firefox */
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar {
+  width: var(--scrollbar-thin-width);   /* Chrome, Safari, Opera */
+  height: var(--scrollbar-thin-width);
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 10px;
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
 }
 
 body {
