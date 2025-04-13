@@ -20,7 +20,10 @@ import {
   parseISO,
   differenceInSeconds,
   subDays,
-  isAfter
+  isAfter,
+  getDay,
+  addDays,
+  isValid
 } from 'date-fns';
 import { 
   ChevronLeft, 
@@ -28,7 +31,6 @@ import {
   RefreshCw, 
   PlusCircle, 
   AlertCircle, 
-  CalendarDays, 
   Star, 
   ListChecks, 
   Award, 
@@ -153,7 +155,7 @@ const MistakeDiary: NextPage = () => {
   const [loadingImage, setLoadingImage] = useState<boolean>(true);
   const [imageError, setImageError] = useState<string | null>(null);
   const [selectedApiUrl, setSelectedApiUrl] = useState<string>(apiSources[0].url);
-  const [, setCurrentApiType] = useState<ApiSource['type']>(apiSources[0].type);
+  // 不再需要跟踪 API 类型
 
   // 犯错计时模态框状态
   const [showTimerModal, setShowTimerModal] = useState<boolean>(false);
@@ -232,7 +234,7 @@ const MistakeDiary: NextPage = () => {
     } finally {
       setLoadingImage(false);
     }
-  }, [selectedApiUrl, apiSources]);
+  }, [selectedApiUrl]);
 
   useEffect(() => {
     fetchImage();
