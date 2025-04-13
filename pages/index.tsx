@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector';
 import {
@@ -34,15 +35,13 @@ import {
   Smile, 
   Meh, 
   Frown, 
-  PlayCircle, 
   StopCircle, 
   Clock, 
   X, 
-  Send, 
   MessageSquare, 
   Save, 
   SkipForward, 
-  Image as ImageIcon,
+  ImageIcon,
   BookOpen
 } from 'lucide-react';
 
@@ -154,7 +153,7 @@ const MistakeDiary: NextPage = () => {
   const [loadingImage, setLoadingImage] = useState<boolean>(true);
   const [imageError, setImageError] = useState<string | null>(null);
   const [selectedApiUrl, setSelectedApiUrl] = useState<string>(apiSources[0].url);
-  const [currentApiType, setCurrentApiType] = useState<ApiSource['type']>(apiSources[0].type);
+  const [, setCurrentApiType] = useState<ApiSource['type']>(apiSources[0].type);
 
   // 犯错计时模态框状态
   const [showTimerModal, setShowTimerModal] = useState<boolean>(false);
@@ -168,9 +167,11 @@ const MistakeDiary: NextPage = () => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 获取每日图片
   const fetchImage = useCallback(async () => {
     setLoadingImage(true);
     setImageError(null);
+    
     const apiToUse = apiSources.find(api => api.url === selectedApiUrl);
     if (!apiToUse) {
       setImageError('选择的API无效');
@@ -178,17 +179,10 @@ const MistakeDiary: NextPage = () => {
       return;
     }
 
-    const urlWithCacheBust = `${apiToUse.url}${apiToUse.url.includes('?') ? '&' : '?'}t=${Date.now()}`;
-
-    try {
-      const response = await fetch(urlWithCacheBust);
-
+    try {      
+      const response = await fetch(selectedApiUrl);
       if (!response.ok) {
-        // Even redirects might have !ok status initially, but check final URL later
-        // If it's a real error, throw
-        if (response.status >= 400) {
-          throw new Error(`网络响应错误: ${response.status}`);
-        }
+        throw new Error(`API请求失败: ${response.status}`);
       }
 
       if (apiToUse.type === 'redirect') {
@@ -196,7 +190,6 @@ const MistakeDiary: NextPage = () => {
         if (response.url) {
           setImageUrl(response.url);
         } else {
-          // Fallback if URL is not available, maybe try blob (less likely for redirect)
           throw new Error('API重定向后无法获取图片URL');
         }
       } else if (apiToUse.type === 'json_pics') {
@@ -214,31 +207,32 @@ const MistakeDiary: NextPage = () => {
           throw new Error('API响应格式错误 (json_pic)');
         }
       } else if (apiToUse.type === 'json_direct_url') {
-         // If API returns JSON where the URL is the direct response
-         const data = await response.json();
-         // Assuming the URL is in a 'url' field, adjust if needed
-         if (data.url) { 
-            setImageUrl(data.url);
-         } else {
-            throw new Error('API响应格式错误 (json_direct_url)');
-         }
+        const data = await response.json();
+        if (data.url) { 
+          setImageUrl(data.url);
+        } else {
+          throw new Error('API响应格式错误 (json_direct_url)');
+        }
       } else {
-         // Default or fallback: try to use response.url, might work for some
-         if (response.url) {
-            setImageUrl(response.url);
-         } else {
-            throw new Error('无法识别的API类型或无法获取URL');
-         }
+        // Default fallback
+        const data = await response.json();
+        const imageUrl = data.url || data.urls?.regular || '';
+        
+        if (imageUrl) {
+          setImageUrl(imageUrl);
+        } else {
+          throw new Error('无法识别的API类型或无法获取URL');
+        }
       }
-
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('获取图片出错:', error);
-      setImageError(`加载图片失败: ${error.message}`);
-      setImageUrl(''); // Clear image on error
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      setImageError(`加载图片失败: ${errorMessage}`);
+      setImageUrl('');
     } finally {
       setLoadingImage(false);
     }
-  }, [selectedApiUrl]);
+  }, [selectedApiUrl, apiSources]);
 
   useEffect(() => {
     fetchImage();
@@ -387,7 +381,6 @@ const MistakeDiary: NextPage = () => {
     const newApi = apiSources.find(api => api.url === newUrl);
     if (newApi) {
       setSelectedApiUrl(newUrl);
-      setCurrentApiType(newApi.type);
       // No need to fetch here, useEffect dependency on selectedApiUrl will trigger fetch
     } else {
       console.error("Selected API not found in sources");
@@ -573,10 +566,13 @@ const MistakeDiary: NextPage = () => {
                 </div>
               )}
               {!loadingImage && !imageError && imageUrl && (
-                <img 
+                <Image 
                   src={imageUrl} 
                   alt="每日图片" 
                   className="w-full h-full object-cover" 
+                  width={500}
+                  height={300}
+                  unoptimized
                   onError={(e) => {
                     console.error('图片加载失败:', e);
                     setImageError('图片加载失败');
