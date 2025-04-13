@@ -4,26 +4,23 @@ import Image from 'next/image';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector';
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
   isSameMonth,
   isSameDay,
+  isToday,
+  parseISO,
+  formatISO,
   addMonths,
   subMonths,
-  getDate,
-  isToday,
-  formatISO,
-  parseISO,
+  format,
   differenceInSeconds,
   subDays,
   isAfter,
-  getDay,
-  addDays,
-  isValid
+  startOfWeek,
+  startOfMonth,
+  endOfWeek,
+  endOfMonth,
+  eachDayOfInterval,
+  getDate
 } from 'date-fns';
 import { 
   ChevronLeft, 
@@ -509,7 +506,7 @@ const MistakeDiary: NextPage = () => {
   const renderCells = () => {
     return (
       <div className="grid grid-cols-7 gap-1 p-2">
-        {daysInMonthGrid.map(day => {
+        {daysInMonthGrid.map((day: Date) => {
           const dateKey = getDateKey(day);
           const mistakeCount = (mistakesByDate[dateKey] || []).length;
           const isCurrentMonthDay = isSameMonth(day, currentMonth);
