@@ -119,8 +119,8 @@ interface ApiSource {
 }
 
 const apiSources: ApiSource[] = [
-  { name: '随机二次元2', url: 'https://www.loliapi.com/bg', type: 'redirect' },
-  { name: '奶龙表情包', url: 'https://oiapi.net/API/FunBoxEmoji/?0=nailong', type: 'redirect' },
+  { name: '二次元', url: 'https://www.loliapi.com/bg', type: 'redirect' },
+  { name: '奶龙', url: 'https://oiapi.net/API/FunBoxEmoji/?0=nailong', type: 'redirect' },
 ];
 
 // 成就定义
@@ -524,9 +524,11 @@ const MistakeDiary: NextPage = () => {
               `}
               onClick={() => handleDateClick(day)}
             >
-              <span className={`text-xs font-semibold ${isTodayDate ? currentTheme.colors.calendarDaysText : ''}`}>
-                {getDate(day)}
-              </span>
+              {isCurrentMonthDay && (
+                <span className={`text-xs font-semibold ${isTodayDate ? currentTheme.colors.calendarDaysText : ''}`}>
+                  {getDate(day)}
+                </span>
+              )}
               {mistakeCount > 0 && (
                 <div className={`mt-1 flex items-center justify-center text-xs ${currentTheme.colors.calendarMistakeCount} font-semibold rounded-full w-5 h-5`}>
                   {mistakeCount}
@@ -545,7 +547,7 @@ const MistakeDiary: NextPage = () => {
       <div className={`max-w-7xl mx-auto ${currentTheme.colors.cardBackground} rounded-xl shadow-lg overflow-hidden`}>
         <header className={`p-6 ${currentTheme.colors.primary} text-center rounded-t-xl`}>
           <h1 className={`text-3xl ${currentTheme.typography.headingWeight} ${currentTheme.typography.headingFont} flex items-center justify-center gap-2`}><BookOpen/> 犯错日记</h1>
-          <p className="mt-2 opacity-90">记录生活中的小失误，回顾与成长</p>
+          <p className="mt-2 opacity-90">来不及了，奶龙对不起😭👊</p>
         </header>
 
         <main className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
